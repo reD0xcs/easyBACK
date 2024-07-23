@@ -47,6 +47,8 @@ font_large = ("Arial", 20)
 font_medium = ("Arial", 14)
 btn_color = "#4CAF50"
 btn_fg_color = "#FFFFFF"
+btn_active_bg = "#3E8E41"  # A shade darker for active state
+btn_active_fg = "#FFFFFF"
 bg_color = "#2E2E2E"
 entry_bg = "#FFFFFF"
 entry_fg = "#000000"
@@ -75,13 +77,16 @@ for row in keys:
     for key in row:
         if key == 'Clear':
             btn = tk.Button(row_frame, text=key, font=font_medium, command=clear_entry,
-                            bg=btn_color, fg=btn_fg_color, width=4, height=2)
+                            bg=btn_color, fg=btn_fg_color, activebackground=btn_active_bg,
+                            activeforeground=btn_active_fg, width=4, height=2)
         elif key == 'Submit':
             btn = tk.Button(row_frame, text=key, font=font_medium, command=check_code,
-                            bg=btn_color, fg=btn_fg_color, width=4, height=2)
+                            bg=btn_color, fg=btn_fg_color, activebackground=btn_active_bg,
+                            activeforeground=btn_active_fg, width=4, height=2)
         else:
             btn = tk.Button(row_frame, text=key, font=font_medium, command=lambda k=key: press_key(k),
-                            bg=btn_color, fg=btn_fg_color, width=4, height=2)
+                            bg=btn_color, fg=btn_fg_color, activebackground=btn_active_bg,
+                            activeforeground=btn_active_fg, width=4, height=2)
         btn.pack(side=tk.LEFT, padx=2)
 
 # Initialize the database
