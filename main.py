@@ -39,10 +39,11 @@ def clear_entry():
 # Set up the main application window
 root = tk.Tk()
 root.title("Code Entry")
-root.geometry("800x480")  # Adjusted for typical 7-inch screen size
+root.geometry("800x480")
+root.config(bg="#2E2E2E")
 
 # Style configuration
-font_large = ("Arial", 18)
+font_large = ("Arial", 20)
 font_medium = ("Arial", 14)
 btn_color = "#4CAF50"
 btn_fg_color = "#FFFFFF"
@@ -52,11 +53,11 @@ entry_fg = "#000000"
 
 # Entry field
 entry = tk.Entry(root, font=font_large, justify='center', bg=entry_bg, fg=entry_fg)
-entry.grid(row=0, column=0, columnspan=10, pady=10, padx=10, sticky="ew")
+entry.pack(pady=10)
 
 # Virtual keyboard
 keys_frame = tk.Frame(root, bg=bg_color)
-keys_frame.grid(row=1, column=0, sticky="nsew")
+keys_frame.pack()
 
 # Full QWERTY keyboard layout
 keys = [
@@ -67,25 +68,21 @@ keys = [
     ['Clear', 'Submit']
 ]
 
-# Create button grid
-for row_index, row in enumerate(keys):
-    for col_index, key in enumerate(row):
+# Add buttons for each key
+for row in keys:
+    row_frame = tk.Frame(keys_frame, bg=bg_color)
+    row_frame.pack(side=tk.TOP, pady=2)
+    for key in row:
         if key == 'Clear':
-            btn = tk.Button(keys_frame, text=key, font=font_medium, command=clear_entry,
-                            bg=btn_color, fg=btn_fg_color, width=6, height=2)
+            btn = tk.Button(row_frame, text=key, font=font_medium, command=clear_entry,
+                            bg=btn_color, fg=btn_fg_color, width=4, height=2)
         elif key == 'Submit':
-            btn = tk.Button(keys_frame, text=key, font=font_medium, command=check_code,
-                            bg=btn_color, fg=btn_fg_color, width=6, height=2)
+            btn = tk.Button(row_frame, text=key, font=font_medium, command=check_code,
+                            bg=btn_color, fg=btn_fg_color, width=4, height=2)
         else:
-            btn = tk.Button(keys_frame, text=key, font=font_medium, command=lambda k=key: press_key(k),
-                            bg=btn_color, fg=btn_fg_color, width=6, height=2)
-        btn.grid(row=row_index, column=col_index, padx=2, pady=2)
-
-# Adjust column and row weights for proper scaling
-for i in range(10):
-    keys_frame.grid_columnconfigure(i, weight=1)
-for i in range(len(keys)):
-    keys_frame.grid_rowconfigure(i, weight=1)
+            btn = tk.Button(row_frame, text=key, font=font_medium, command=lambda k=key: press_key(k),
+                            bg=btn_color, fg=btn_fg_color, width=4, height=2)
+        btn.pack(side=tk.LEFT, padx=2)
 
 # Initialize the database
 create_db()
