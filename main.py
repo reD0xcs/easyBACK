@@ -29,8 +29,12 @@ def check_code():
         messagebox.showerror("Error", "Invalid Code")
 
 # Function to handle button clicks on the virtual keyboard
-def press_key(key):
+def press_key(key, btn):
     entry.insert(tk.END, key)
+    # Change the button's appearance to indicate it was pressed
+    btn.config(relief=tk.SUNKEN)
+    # Reset the button's appearance after 0.2 seconds
+    root.after(200, lambda: btn.config(relief=tk.RAISED))
 
 # Function to clear the entry field
 def clear_entry():
@@ -84,9 +88,10 @@ for row in keys:
                             bg=btn_color, fg=btn_fg_color, activebackground=btn_active_bg,
                             activeforeground=btn_active_fg, width=4, height=2)
         else:
-            btn = tk.Button(row_frame, text=key, font=font_medium, command=lambda k=key: press_key(k),
-                            bg=btn_color, fg=btn_fg_color, activebackground=btn_active_bg,
+            btn = tk.Button(row_frame, text=key, font=font_medium, bg=btn_color,
+                            fg=btn_fg_color, activebackground=btn_active_bg,
                             activeforeground=btn_active_fg, width=4, height=2)
+            btn.config(command=lambda k=key, b=btn: press_key(k, b))
         btn.pack(side=tk.LEFT, padx=2)
 
 # Initialize the database
