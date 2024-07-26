@@ -1,6 +1,26 @@
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
+import RPi.GPIO as GPIO
+import time
+
+# GPIO setup for the servomotor
+SERVO_PIN = 12  # Change this to the GPIO pin you're using
+
+def setup_servo():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(SERVO_PIN, GPIO.OUT)
+    pwm = GPIO.PWM(SERVO_PIN, 50)  # 50Hz frequency
+    pwm.start(0)
+    return pwm
+
+def turn_servo(pwm, angle):
+    duty_cycle = (angle / 18) + 2
+    GPIO.output(SERVO_PIN, True)
+    pwm.ChangeDutyCycle(duty_cycle)
+    time.sleep(1)
+    GPIO.output(SERVO_PIN, False)
+    pwm.ChangeDutyCycle(0)
 
 # Function to create the database and table
 def create_db():
@@ -25,6 +45,7 @@ def check_code():
     conn.close()
     if result:
         messagebox.showinfo("Success", "Open")
+        turn_servo(pwm, 90)  # Turn the servo motor 90 degrees
     else:
         messagebox.showerror("Error", "Invalid Code")
 
@@ -97,5 +118,11 @@ for row in keys:
 # Initialize the database
 create_db()
 
+# Setup the servo motor
+pwm = setup_servo()
+
 # Run the application
 root.mainloop()
+
+# Clean up GPIO on exit
+GPIO.cleanup()
