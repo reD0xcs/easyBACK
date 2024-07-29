@@ -4,8 +4,9 @@ import sqlite3
 import RPi.GPIO as GPIO
 import time
 
-# GPIO setup for the servomotor
-SERVO_PIN = 12  # Change this to the GPIO pin you're using
+
+
+SERVO_PIN = 16  # Change this to the GPIO pin you're using
 
 def setup_servo():
     GPIO.setmode(GPIO.BCM)
@@ -15,12 +16,14 @@ def setup_servo():
     return pwm
 
 def turn_servo(pwm, angle):
-    duty_cycle = (angle / 18) + 2
+    # Typical duty cycle range for SG90 is around 2.5 to 12.5
+    duty_cycle = (angle / 180) * (12.5 - 2.5) + 2.5
     GPIO.output(SERVO_PIN, True)
     pwm.ChangeDutyCycle(duty_cycle)
-    time.sleep(1)  # Adjust sleep time based on servo movement speed
+    time.sleep(1)  # Adjust sleep time based on desired movement speed
     GPIO.output(SERVO_PIN, False)
     pwm.ChangeDutyCycle(0)
+
 
 def create_db():
     conn = sqlite3.connect('codes.db')
