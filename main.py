@@ -37,6 +37,10 @@ def create_db():
     conn.commit()
     conn.close()
 
+def reset_servo(pwm):
+    pwm.ChangeDutyCycle(7.5)  # Replace 7.5 with your neutral position duty cycle
+    time.sleep(0.5)
+
 def check_code():
     entered_code = entry.get()
     conn = sqlite3.connect('codes.db')
@@ -47,6 +51,8 @@ def check_code():
     if result:
         messagebox.showinfo("Success", "Opening Lock")
         turn_servo(pwm, 90)  # Turn the servo motor 90 degrees to open
+        time.sleep(5)  # Hold the position for 5 seconds
+        reset_servo(pwm)  # Return to neutral position
     else:
         messagebox.showerror("Error", "Invalid Code")
 
