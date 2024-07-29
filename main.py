@@ -15,13 +15,23 @@ def setup_servo():
     pwm.start(0)
     return pwm
 
-def turn_servo(pwm, angle):
-    duty_cycle = (angle / 18) + 2
+def turn_servo():
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(SERVO_PIN, GPIO.OUT)
+    pwm = GPIO.PWM(SERVO_PIN, 50)  # 50Hz frequency
+    pwm.start(0)
+
+    # Assuming 90 degrees corresponds to a duty cycle of 7.5 (adjust as needed)
+    duty_cycle = 7.5
     GPIO.output(SERVO_PIN, True)
     pwm.ChangeDutyCycle(duty_cycle)
     time.sleep(1)
     GPIO.output(SERVO_PIN, False)
     pwm.ChangeDutyCycle(0)
+
+    pwm.stop()
+    GPIO.cleanup()
 
 # Function to create the database and table
 def create_db():
@@ -46,7 +56,7 @@ def check_code():
     conn.close()
     if result:
         messagebox.showinfo("Success", "Open")
-        turn_servo(pwm, 90)  # Turn the servo motor 90 degrees
+        turn_servo(pwm, -90)  # Turn the servo motor 90 degrees
     else:
         messagebox.showerror("Error", "Invalid Code")
 
