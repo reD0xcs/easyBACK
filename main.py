@@ -5,10 +5,11 @@ import RPi.GPIO as GPIO
 import time
 
 # GPIO setup for the servomotor
-SERVO_PIN = 12  # Change this to the GPIO pin you're using
+SERVO_PIN = 16  # Change this to the GPIO pin you're using
 
 def setup_servo():
-    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BOARD)
     GPIO.setup(SERVO_PIN, GPIO.OUT)
     pwm = GPIO.PWM(SERVO_PIN, 50)  # 50Hz frequency
     pwm.start(0)
