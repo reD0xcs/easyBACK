@@ -5,48 +5,35 @@ import RPi.GPIO as GPIO
 import time
 
 # GPIO setup for the servomotor
-SERVO_PIN = 16  # Change this to the GPIO pin you're using
+SERVO_PIN = 12  # Change this to the GPIO pin you're using
 
 def setup_servo():
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BOARD)
+    GPIO.setmode(GPIO.BCM)
     GPIO.setup(SERVO_PIN, GPIO.OUT)
     pwm = GPIO.PWM(SERVO_PIN, 50)  # 50Hz frequency
     pwm.start(0)
     return pwm
 
-def turn_servo():
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(SERVO_PIN, GPIO.OUT)
-    pwm = GPIO.PWM(SERVO_PIN, 50)  # 50Hz frequency
-    pwm.start(0)
-
-    # Assuming 90 degrees corresponds to a duty cycle of 7.5 (adjust as needed)
-    duty_cycle = 7.5
+def turn_servo(pwm, angle):
+    duty_cycle = (angle / 18) + 2
     GPIO.output(SERVO_PIN, True)
     pwm.ChangeDutyCycle(duty_cycle)
-    time.sleep(1)
+    time.sleep(1)  # Adjust sleep time based on servo movement speed
     GPIO.output(SERVO_PIN, False)
     pwm.ChangeDutyCycle(0)
 
-    pwm.stop()
-    GPIO.cleanup()
-
-# Function to create the database and table
 def create_db():
     conn = sqlite3.connect('codes.db')
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS codes
-                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                       code TEXT NOT NULL)''')
+                        (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                         code TEXT NOT NULL)''')
     # Insert sample codes (you can add more or change these codes as needed)
     cursor.execute("INSERT INTO codes (code) VALUES ('1234')")
     cursor.execute("INSERT INTO codes (code) VALUES ('5678')")
     conn.commit()
     conn.close()
 
-# Function to check if the code exists in the database
 def check_code():
     entered_code = entry.get()
     conn = sqlite3.connect('codes.db')
@@ -55,12 +42,11 @@ def check_code():
     result = cursor.fetchone()
     conn.close()
     if result:
-        messagebox.showinfo("Success", "Open")
-        turn_servo(pwm, -90)  # Turn the servo motor 90 degrees
+        messagebox.showinfo("Success", "Opening Lock")
+        turn_servo(pwm, 90)  # Turn the servo motor 90 degrees to open
     else:
         messagebox.showerror("Error", "Invalid Code")
 
-# Function to handle button clicks on the virtual keyboard
 def press_key(key, btn):
     entry.insert(tk.END, key)
     # Change the button's appearance to indicate it was pressed
@@ -68,17 +54,16 @@ def press_key(key, btn):
     # Reset the button's appearance after 0.2 seconds
     root.after(200, lambda: btn.config(relief=tk.RAISED))
 
-# Function to clear the entry field
 def clear_entry():
     entry.delete(0, tk.END)
 
-# Set up the main application window
+# Main application code
 root = tk.Tk()
 root.title("Code Entry")
 root.geometry("800x480")
 root.config(bg="#2E2E2E")
 
-# Style configuration
+# Style configuration (optional)
 font_large = ("Arial", 20)
 font_medium = ("Arial", 14)
 btn_color = "#4CAF50"
@@ -106,7 +91,6 @@ keys = [
     ['Clear', 'Submit']
 ]
 
-# Add buttons for each key
 for row in keys:
     row_frame = tk.Frame(keys_frame, bg=bg_color)
     row_frame.pack(side=tk.TOP, pady=2)
@@ -137,3 +121,4 @@ root.mainloop()
 
 # Clean up GPIO on exit
 GPIO.cleanup()
+
