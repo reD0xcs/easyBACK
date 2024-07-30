@@ -1,3 +1,4 @@
+
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
@@ -5,24 +6,33 @@ import RPi.GPIO as GPIO
 import time
 
 
+SERVO_LOCK_PIN = 18
+SERVO_PUSH_PIN = 16
 
-SERVO_PIN = 16  # Change this to the GPIO pin you're using
+LOCKED_SERVO = 7.5
+UNLOCKED_SERVO = 2
+
+PUSHED_SERVO = 5
+UNPUSHED_SERVO = 10
 
 def setup_servo():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(SERVO_PIN, GPIO.OUT)
-    pwm = GPIO.PWM(SERVO_PIN, 50)  # 50Hz frequency
-    pwm.start(0)
-    return pwm
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(SERVO_LOCK_PIN, GPIO.OUT)
+    GPIO.setup(SERVO_PUSH_PIN, GPIO.OUT)
+    lock_pwm = GPIO.PWM(SERVO_LOCK_PIN, 50)  # 50Hz frequency
+    lock_pwm.start(0)
+    push_pwm = GPIO.PWM(SERVO_PUSH_PIN, 50)  # 50Hz frequency
+    push_pwm.start(0)
+    return lock_pwm, push_pwm
 
-def turn_servo(pwm, angle):
-    # Typical duty cycle range for SG90 is around 2.5 to 12.5
-    duty_cycle = (angle / 180) * (12.5 - 2.5) + 2.5
-    GPIO.output(SERVO_PIN, True)
-    pwm.ChangeDutyCycle(duty_cycle)
-    time.sleep(1)  # Adjust sleep time based on desired movement speed
-    GPIO.output(SERVO_PIN, False)
-    pwm.ChangeDutyCycle(0)
+def servo_lock(pwm):
+    pwm.ChangeDutyCycle(LOCKED_SERVO)
+    time.sleep(1)
+
+def servo_push(pwm):
+    pwm.ChangeDutyCycle(PUSHED_SERVO)
+    time.sleep(0.3)
+    pwm.ChangeDutyCycle(UNPUSHED_SERVO)
 
 
 def create_db():
@@ -37,8 +47,8 @@ def create_db():
     conn.commit()
     conn.close()
 
-def reset_servo(pwm):
-    pwm.ChangeDutyCycle(7.5)  # Replace 7.5 with your neutral position duty cycle
+def servo_unlock(pwm):
+    pwm.ChangeDutyCycle(UNLOCKED_SERVO)
     time.sleep(0.5)
 
 def check_code():
@@ -50,9 +60,10 @@ def check_code():
     conn.close()
     if result:
         messagebox.showinfo("Success", "Opening Lock")
-        turn_servo(pwm, 90)  # Turn the servo motor 90 degrees to open
+        servo_unlock(lock_pwm)  # Return to neutral position
+        servo_push(push_pwm)
         time.sleep(5)  # Hold the position for 5 seconds
-        reset_servo(pwm)  # Return to neutral position
+        servo_lock(lock_pwm)  # Turn the servo motor 90 degrees to open
     else:
         messagebox.showerror("Error", "Invalid Code")
 
@@ -123,7 +134,7 @@ for row in keys:
 create_db()
 
 # Setup the servo motor
-pwm = setup_servo()
+lock_pwm, push_pwm = setup_servo()
 
 # Run the application
 root.mainloop()
