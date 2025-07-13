@@ -1,16 +1,16 @@
 # Lost & Found Touchscreen System
 
-*Python-based locker management for Raspberry Pi with 7" touch display*
+*Python-based locker management demo for Raspberry Pi with 7" touch display*
 
 ## Overview
 
-A production-ready touchscreen application for secure item reporting, featuring:
+A functional touchscreen demo application for secure item reporting, featuring:
 
 - Role-based Tkinter GUI (lost/found item interfaces)  
 - Physical locker control via servo motors  
 - SQLite database for access code storage  
 
-**Production Hardware**:
+**Hardware Requirements**:
 
 - Raspberry Pi 4  
 - 7" Capacitive Touch Display  
